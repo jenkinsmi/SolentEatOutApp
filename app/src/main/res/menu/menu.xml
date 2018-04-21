@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/addrestaurant" android:title="@string/addrestaurant"/>
+    <item android:id="@+id/savetofile" android:title="@string/savetofile"/>
+    <item android:id="@+id/preferences" android:title="@string/preferences"/>
+</menu>

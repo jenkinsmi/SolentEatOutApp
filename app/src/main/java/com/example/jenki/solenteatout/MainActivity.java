@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements LocationListener
 {
-
     MapView mv;
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -64,4 +63,29 @@ public class MainActivity extends AppCompatActivity implements LocationListener
         Toast.makeText(this, "Status changed: " + status,
                 Toast.LENGTH_LONG).show();
     }
+
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if(item.getItemId() == R.id.addrestaurant)
+        {
+            Intent intent = new Intent(this,AddRestaurantActivity.class);
+            startActivityForResult(intent, 0);
+            return true;
+        }
+        else if (item.getItemId() == R.id.preferences)
+        {
+            Intent intent = new Intent(this, PreferencesActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return false;
+    }
+
 }
