@@ -17,10 +17,14 @@ import android.location.LocationListener;
 import android.location.Location;
 import android.content.Context;
 import android.widget.Toast;
+import java.util.ArrayList;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
 
 public class MainActivity extends AppCompatActivity implements LocationListener
 {
     MapView mv;
+    ItemizedIconOverlay<OverlayItem> items;
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -32,9 +36,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener
         mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this);
 
         mv = (MapView)findViewById(R.id.map1);
-
         mv.setBuiltInZoomControls(true);
         mv.getController().setZoom(16);
+        mv.getController().setCenter(new GeoPoint(50.913639,-1.411781));
     }
 
     public void onLocationChanged(Location newLoc)
