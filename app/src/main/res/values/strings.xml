@@ -3,4 +3,8 @@
     <string name="addrestaurant">Add Restaurant</string>
     <string name="savetofile">Save To File</string>
     <string name="preferences">Preferences</string>
+    <string name="tv1">Restaurant Name:</string>
+    <string name="tv2">Restaurant Address:</string>
+    <string name="tv3">Cuisine:</string>
+    <string name="tv4">Rating /10:</string>
 </resources>

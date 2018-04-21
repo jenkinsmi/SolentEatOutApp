@@ -39,6 +39,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener
         mv.setBuiltInZoomControls(true);
         mv.getController().setZoom(16);
         mv.getController().setCenter(new GeoPoint(50.913639,-1.411781));
+
+        items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), null);
+        OverlayItem solent = new OverlayItem("Solent Uni", "Solenty Universityi", new GeoPoint(50.913639, -1.411781));
+        items.addItem(solent);
+        mv.getOverlays().add(items);
     }
 
     public void onLocationChanged(Location newLoc)
@@ -92,4 +97,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener
         return false;
     }
 
+    protected void onActivityResult(int requestCode,int resultCode,Intent intent)
+    {
+
+        if(requestCode==0)
+        {
+
+            if (resultCode==RESULT_OK)
+            {
+
+            }
+        }
 }
