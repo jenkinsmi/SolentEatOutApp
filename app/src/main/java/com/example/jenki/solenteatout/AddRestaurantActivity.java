@@ -41,15 +41,16 @@ public class AddRestaurantActivity extends Activity implements View.OnClickListe
         EditText add = (EditText)findViewById(R.id.et2);
         EditText cui = (EditText)findViewById(R.id.et3);
         EditText rat = (EditText)findViewById(R.id.et4);
-        double name = Double.parseDouble(nam.getText().toString());
-        double address = Double.parseDouble(add.getText().toString());
-        double cuisine = Double.parseDouble(cui.getText().toString());
-        double rating = Double.parseDouble(rat.getText().toString());
 
-        bundle.putDouble("com.example.jenki.solenteatout.name",name);
-        bundle.putDouble("com.example.jenki.solenteatout.address",address);
-        bundle.putDouble("com.example.jenki.solenteatout.cuisine",cuisine);
-        bundle.putDouble("com.example.jenki.solenteatout.rating",rating);
+        String name = nam.getText().toString();
+        String address = add.getText().toString();
+        String cuisine = cui.getText().toString();
+        String rating = rat.getText().toString();
+
+        bundle.putString("com.example.jenki.solenteatout.name",name);
+        bundle.putString("com.example.jenki.solenteatout.address",address);
+        bundle.putString("com.example.jenki.solenteatout.cuisine",cuisine);
+        bundle.putString("com.example.jenki.solenteatout.rating",rating);
         intent.putExtras(bundle);
         setResult(RESULT_OK,intent);
         finish();
