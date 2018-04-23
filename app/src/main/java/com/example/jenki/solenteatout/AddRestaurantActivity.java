@@ -25,11 +25,11 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
 public class AddRestaurantActivity extends Activity implements View.OnClickListener{
-}
+
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_restaurant;
+        setContentView(R.layout.activity_add_restaurant);
         Button regular = (Button)findViewById(R.id.bt1);
         regular.setOnClickListener(this);
     }
@@ -55,3 +55,4 @@ public class AddRestaurantActivity extends Activity implements View.OnClickListe
         setResult(RESULT_OK,intent);
         finish();
     }
+}

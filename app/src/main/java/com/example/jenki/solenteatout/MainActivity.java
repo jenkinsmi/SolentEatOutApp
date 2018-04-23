@@ -1,6 +1,7 @@
 package com.example.jenki.solenteatout;
 
 import android.app.Activity;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,10 +18,14 @@ import android.location.LocationListener;
 import android.location.Location;
 import android.content.Context;
 import android.widget.Toast;
+
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
     MapView mv;
@@ -42,10 +47,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mv.getController().setCenter(new GeoPoint(50.913639, -1.411781));
 
         items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), null);
-        OverlayItem solent = new OverlayItem("Solent Uni", "Solenty Universityi", new GeoPoint(50.913639, -1.411781));
-        items.addItem(solent);
-        mv.getOverlays().add(items);
-
         markerGestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
 
             public boolean onItemSingleTapUp(int index, OverlayItem item) {
@@ -58,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 return true;
             }
         };
+     ///the save all files thing goes here, on start
+
     }
 
     public void onLocationChanged(Location newLoc) {
@@ -99,10 +102,40 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             startActivity(intent);
             return true;
         }
+          else if (item.getItemId() == R.id.savetofile) {
+
+          for(int i = 0; i<items.size(); i++) {
+
+              String restaurantname = items.getItem(i).getTitle();
+              String restaurantsnippet = items.getItem(i).getSnippet();
+              Double restaurantlatitude = items.getItem(i).getPoint().getLatitude();
+              Double restaurantlongitude = items.getItem(i).getPoint().getLongitude();
+
+              try
+              {
+                  PrintWriter pw =
+                          new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/savedRestaurants.csv", true));
+
+                  for(int i=0; i<items.size(); i++)
+                  {
+                      OverlayItem it = items.getItem(i);
+                      pw.println(restaurantname + "," + restaurantsnippet + "," + restaurantlatitude + "'" + restaurantlongitude);
+
+                  }
+                    pw.close();
+              }
+              catch ()
+              {
+                  Toast.makeText(this,"Error Saving" , Toast.LENGTH_LONG).show();
+              }
+
+              Toast.makeText(this,"Restaurants Saved" , Toast.LENGTH_LONG).show();
+          }
+            return true;
+
+        }
         return false;
     }
-
-
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == 0) {
@@ -114,12 +147,43 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 String restaurantCuisineString = extras.getString("com.example.jenki.solenteatout.cuisine");
                 String restaurantRatingString = extras.getString("com.example.jenki.solenteatout.rating");
                 items = new ItemizedIconOverlay<>(this, new ArrayList<OverlayItem>(), markerGestureListener);
-                OverlayItem mapMarker = new OverlayItem(restaurantNameString, "Restaurant address:" + restaurantAddressString
-                        + "Restaurant cuisine:" + restaurantCuisineString + "Restaurant rating:" + restaurantRatingString, mv.getMapCenter());
+                OverlayItem mapMarker = new OverlayItem(restaurantNameString, "," + restaurantAddressString
+                        + "," + restaurantCuisineString + "," + restaurantRatingString, mv.getMapCenter());
                 items.addItem(mapMarker);
                 mv.getOverlays().add(items);
+
+                ///make it so the preference being clicked makes this happen.
+                Sharedpreferences
+                if
+
+                for(int i = 0; i<items.size(); i++) {
+
+                    String restaurantname = items.getItem(i).getTitle();
+                    String restaurantsnippet = items.getItem(i).getSnippet();
+                    Double restaurantlatitude = items.getItem(i).getPoint().getLatitude();
+                    Double restaurantlongitude = items.getItem(i).getPoint().getLongitude();
+
+                    try
+                    {
+                        PrintWriter pw =
+                                new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/savedRestaurants.csv", true));
+
+                        for(int i=0; i<items.size(); i++)
+                        {
+                            OverlayItem it = items.getItem(i);
+                            pw.println(restaurantname + "," + restaurantsnippet + "," + restaurantlatitude + "'" + restaurantlongitude);
+
+                        }
+                        pw.close();
+                    }
+                    catch ()
+                    {
+                        Toast.makeText(this,"Error Saving" , Toast.LENGTH_LONG).show();
+                    }
+
+                    Toast.makeText(this,"Restaurants Saved" , Toast.LENGTH_LONG).show();
+                }
             }
         }
-
     }
 }
