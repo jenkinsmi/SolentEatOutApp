@@ -1,6 +1,5 @@
 package com.example.jenki.solenteatout;
 
-import android.app.Activity;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
@@ -10,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import android.location.LocationManager;
@@ -18,18 +16,16 @@ import android.location.LocationListener;
 import android.location.Location;
 import android.content.Context;
 import android.widget.Toast;
-
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
-import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
-import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
     MapView mv;
-    ItemizedIconOverlay<OverlayItem> items;
+    ItemizedIconOverlay<OverlayItem> MarkerArray;
     ItemizedIconOverlay.OnItemGestureListener<OverlayItem> markerGestureListener;
 
     @Override
@@ -46,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mv.getController().setZoom(16);
         mv.getController().setCenter(new GeoPoint(50.913639, -1.411781));
 
-        items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), null);
+        MarkerArray = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), null);
         markerGestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
 
             public boolean onItemSingleTapUp(int index, OverlayItem item) {
@@ -104,27 +100,27 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
           else if (item.getItemId() == R.id.savetofile) {
 
-          for(int i = 0; i<items.size(); i++) {
+          for(int i = 0; i< MarkerArray.size(); i++) {
 
-              String restaurantname = items.getItem(i).getTitle();
-              String restaurantsnippet = items.getItem(i).getSnippet();
-              Double restaurantlatitude = items.getItem(i).getPoint().getLatitude();
-              Double restaurantlongitude = items.getItem(i).getPoint().getLongitude();
+              String restaurantname = MarkerArray.getItem(i).getTitle();
+              String restaurantsnippet = MarkerArray.getItem(i).getSnippet();
+              Double restaurantlatitude = MarkerArray.getItem(i).getPoint().getLatitude();
+              Double restaurantlongitude = MarkerArray.getItem(i).getPoint().getLongitude();
 
               try
               {
                   PrintWriter pw =
                           new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/savedRestaurants.csv", true));
 
-                  for(int i=0; i<items.size(); i++)
+                  for(int o = 0; o< MarkerArray.size(); o++)
                   {
-                      OverlayItem it = items.getItem(i);
+                      OverlayItem it = MarkerArray.getItem(o);
                       pw.println(restaurantname + "," + restaurantsnippet + "," + restaurantlatitude + "'" + restaurantlongitude);
 
                   }
                     pw.close();
               }
-              catch ()
+              catch (IOException e)
               {
                   Toast.makeText(this,"Error Saving" , Toast.LENGTH_LONG).show();
               }
@@ -146,37 +142,36 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 String restaurantAddressString = extras.getString("com.example.jenki.solenteatout.address");
                 String restaurantCuisineString = extras.getString("com.example.jenki.solenteatout.cuisine");
                 String restaurantRatingString = extras.getString("com.example.jenki.solenteatout.rating");
-                items = new ItemizedIconOverlay<>(this, new ArrayList<OverlayItem>(), markerGestureListener);
+                MarkerArray = new ItemizedIconOverlay<>(this, new ArrayList<OverlayItem>(), markerGestureListener);
                 OverlayItem mapMarker = new OverlayItem(restaurantNameString, "," + restaurantAddressString
                         + "," + restaurantCuisineString + "," + restaurantRatingString, mv.getMapCenter());
-                items.addItem(mapMarker);
-                mv.getOverlays().add(items);
+                MarkerArray.addItem(mapMarker);
+                mv.getOverlays().add(MarkerArray);
 
                 ///make it so the preference being clicked makes this happen.
-                Sharedpreferences
-                if
 
-                for(int i = 0; i<items.size(); i++) {
 
-                    String restaurantname = items.getItem(i).getTitle();
-                    String restaurantsnippet = items.getItem(i).getSnippet();
-                    Double restaurantlatitude = items.getItem(i).getPoint().getLatitude();
-                    Double restaurantlongitude = items.getItem(i).getPoint().getLongitude();
+                for(int i = 0; i< MarkerArray.size(); i++) {
+
+                    String restaurantname = MarkerArray.getItem(i).getTitle();
+                    String restaurantsnippet = MarkerArray.getItem(i).getSnippet();
+                    Double restaurantlatitude = MarkerArray.getItem(i).getPoint().getLatitude();
+                    Double restaurantlongitude = MarkerArray.getItem(i).getPoint().getLongitude();
 
                     try
                     {
                         PrintWriter pw =
                                 new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/savedRestaurants.csv", true));
 
-                        for(int i=0; i<items.size(); i++)
+                        for(int o = 0; o< MarkerArray.size(); o++)
                         {
-                            OverlayItem it = items.getItem(i);
+                            OverlayItem it = MarkerArray.getItem(o);
                             pw.println(restaurantname + "," + restaurantsnippet + "," + restaurantlatitude + "'" + restaurantlongitude);
 
                         }
                         pw.close();
                     }
-                    catch ()
+                    catch (IOException e)
                     {
                         Toast.makeText(this,"Error Saving" , Toast.LENGTH_LONG).show();
                     }
