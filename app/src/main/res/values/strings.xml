@@ -7,4 +7,5 @@
     <string name="tv2">Restaurant Address:</string>
     <string name="tv3">Cuisine:</string>
     <string name="tv4">Rating /10:</string>
+    <string name="load">Load</string>
 </resources>

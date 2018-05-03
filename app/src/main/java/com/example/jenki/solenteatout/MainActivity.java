@@ -1,6 +1,8 @@
 package com.example.jenki.solenteatout;
 
+import android.content.SharedPreferences;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +18,9 @@ import android.location.LocationListener;
 import android.location.Location;
 import android.content.Context;
 import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -99,38 +104,55 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             return true;
         }
           else if (item.getItemId() == R.id.savetofile) {
-
-          for(int i = 0; i< MarkerArray.size(); i++) {
-
-              String restaurantname = MarkerArray.getItem(i).getTitle();
-              String restaurantsnippet = MarkerArray.getItem(i).getSnippet();
-              Double restaurantlatitude = MarkerArray.getItem(i).getPoint().getLatitude();
-              Double restaurantlongitude = MarkerArray.getItem(i).getPoint().getLongitude();
-
-              try
+            try
               {
-                  PrintWriter pw =
-                          new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/savedRestaurants.csv", true));
+                  PrintWriter pw = new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/savedRestaurants.csv", true));
 
-                  for(int o = 0; o< MarkerArray.size(); o++)
+                  for(int i = 0; i< MarkerArray.size(); i++)
                   {
-                      OverlayItem it = MarkerArray.getItem(o);
-                      pw.println(restaurantname + "," + restaurantsnippet + "," + restaurantlatitude + "'" + restaurantlongitude);
+                      String restaurantname = MarkerArray.getItem(i).getTitle();
+                      String restaurantsnippet = MarkerArray.getItem(i).getSnippet();
+                      Double restaurantlatitude = MarkerArray.getItem(i).getPoint().getLatitude();
+                      Double restaurantlongitude = MarkerArray.getItem(i).getPoint().getLongitude();
 
+                      pw.println(restaurantname + "," + restaurantsnippet + "," + restaurantlatitude + "," + restaurantlongitude);
                   }
-                    pw.close();
+                  pw.close();
+
+                  Toast.makeText(this,"Restaurants Saved" , Toast.LENGTH_LONG).show();
               }
-              catch (IOException e)
+              catch(IOException e)
               {
-                  Toast.makeText(this,"Error Saving" , Toast.LENGTH_LONG).show();
+                  Toast.makeText(this, "Error Saving", Toast.LENGTH_LONG).show();
               }
-
-              Toast.makeText(this,"Restaurants Saved" , Toast.LENGTH_LONG).show();
           }
-            return true;
 
+            else if (item.getItemId() == R.id.load) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(Environment.getExternalStorageDirectory().getAbsolutePath() + "/savedRestaurants.csv"));
+                String line;
+                while ((line = reader.readLine()) != null )  {
+                    String[] comp = line.split(",");
+                    if(comp.length == 6)  {
+                        Double lat = Double.valueOf(comp[4]);
+                        Double lon = Double.valueOf(comp[5]);
+                        MarkerArray = new ItemizedIconOverlay<>(this, new ArrayList<OverlayItem>(), markerGestureListener);
+                        OverlayItem arrayitem = new OverlayItem(comp[0], comp[1]+comp[2]+comp[3], new GeoPoint(lat, lon));
+                        try {
+                            MarkerArray.addItem(arrayitem);
+                            mv.getOverlays().add(MarkerArray);
+                        }
+                        catch (Exception e)  {
+                            new AlertDialog.Builder(this).setMessage(e.toString()).setPositiveButton("good", null).show();
+                        }
+                    }
+                }
+            }
+            catch (IOException e) {
+
+            }
         }
-        return false;
+            return false;
     }
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -143,40 +165,39 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 String restaurantCuisineString = extras.getString("com.example.jenki.solenteatout.cuisine");
                 String restaurantRatingString = extras.getString("com.example.jenki.solenteatout.rating");
                 MarkerArray = new ItemizedIconOverlay<>(this, new ArrayList<OverlayItem>(), markerGestureListener);
-                OverlayItem mapMarker = new OverlayItem(restaurantNameString, "," + restaurantAddressString
-                        + "," + restaurantCuisineString + "," + restaurantRatingString, mv.getMapCenter());
+                OverlayItem mapMarker = new OverlayItem(restaurantNameString, restaurantAddressString + "," + restaurantCuisineString + "," + restaurantRatingString, mv.getMapCenter());
                 MarkerArray.addItem(mapMarker);
                 mv.getOverlays().add(MarkerArray);
 
                 ///make it so the preference being clicked makes this happen.
 
 
-                for(int i = 0; i< MarkerArray.size(); i++) {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                boolean autosave = prefs.getBoolean("autosave", true);
 
-                    String restaurantname = MarkerArray.getItem(i).getTitle();
-                    String restaurantsnippet = MarkerArray.getItem(i).getSnippet();
-                    Double restaurantlatitude = MarkerArray.getItem(i).getPoint().getLatitude();
-                    Double restaurantlongitude = MarkerArray.getItem(i).getPoint().getLongitude();
-
+                if (autosave)
+                {
                     try
                     {
-                        PrintWriter pw =
-                                new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/savedRestaurants.csv", true));
+                        PrintWriter pw = new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/savedRestaurants.csv", true));
 
-                        for(int o = 0; o< MarkerArray.size(); o++)
+                        for(int i = 0; i< MarkerArray.size(); i++)
                         {
-                            OverlayItem it = MarkerArray.getItem(o);
-                            pw.println(restaurantname + "," + restaurantsnippet + "," + restaurantlatitude + "'" + restaurantlongitude);
+                            String restaurantname = MarkerArray.getItem(i).getTitle();
+                            String restaurantsnippet = MarkerArray.getItem(i).getSnippet();
+                            Double restaurantlatitude = MarkerArray.getItem(i).getPoint().getLatitude();
+                            Double restaurantlongitude = MarkerArray.getItem(i).getPoint().getLongitude();
 
+                            pw.println(restaurantname + "," + restaurantsnippet + "," + restaurantlatitude + "," + restaurantlongitude);
                         }
                         pw.close();
-                    }
-                    catch (IOException e)
-                    {
-                        Toast.makeText(this,"Error Saving" , Toast.LENGTH_LONG).show();
-                    }
 
-                    Toast.makeText(this,"Restaurants Saved" , Toast.LENGTH_LONG).show();
+                        Toast.makeText(this,"Restaurants Saved" , Toast.LENGTH_LONG).show();
+                    }
+                    catch(IOException e)
+                    {
+                        Toast.makeText(this, "Error Saving", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         }
