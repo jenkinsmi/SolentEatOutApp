@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         LocationManager mgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-
         mv = (MapView) findViewById(R.id.map1);
         mv.setBuiltInZoomControls(true);
         mv.getController().setZoom(16);
@@ -60,8 +59,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 return true;
             }
         };
-     ///the save all files thing goes here, on start
-
     }
 
     public void onLocationChanged(Location newLoc) {
@@ -168,9 +165,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 OverlayItem mapMarker = new OverlayItem(restaurantNameString, restaurantAddressString + "," + restaurantCuisineString + "," + restaurantRatingString, mv.getMapCenter());
                 MarkerArray.addItem(mapMarker);
                 mv.getOverlays().add(MarkerArray);
-
-                ///make it so the preference being clicked makes this happen.
-
 
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 boolean autosave = prefs.getBoolean("autosave", true);
