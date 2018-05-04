@@ -1,6 +1,7 @@
 package com.example.jenki.solenteatout;
 
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,7 +24,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
@@ -32,7 +37,52 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     MapView mv;
     ItemizedIconOverlay<OverlayItem> MarkerArray;
     ItemizedIconOverlay.OnItemGestureListener<OverlayItem> markerGestureListener;
-
+    class Download extends AsyncTask<Void,Void,String>
+    {
+        public String doInBackground(Void... unused)
+        {
+            HttpURLConnection conn = null;
+            try
+            {URL url = new URL("http://www.free-map.org.uk/course/mad/ws/get.php?year=18&username=user018&format=CSV");
+                conn = (HttpURLConnection) url.openConnection();
+                InputStream in = conn.getInputStream();
+                if(conn.getResponseCode() == 200)
+                {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                    String line;
+                    while((line = br.readLine()) != null)
+                    {
+                        String[] comp = line.split(",");
+                        if (comp.length == 6)
+                        {
+                            Double lat = Double.valueOf(comp[4]);
+                            Double lon = Double.valueOf(comp[5]);
+                            MarkerArray = new ItemizedIconOverlay<>(MainActivity.this, new ArrayList<OverlayItem>(), markerGestureListener);
+                            OverlayItem arrayitem = new OverlayItem(comp[0], comp[1]+comp[2]+comp[3], new GeoPoint(lat, lon));
+                            MarkerArray.addItem(arrayitem);
+                            mv.getOverlays().add(MarkerArray);
+                        }
+                    }
+                    return line;
+                }
+                else
+                {
+                    return "error:" + conn.getResponseCode();
+                }
+            }
+            catch(IOException e)
+            {
+                return e.toString();
+            }
+            finally
+            {
+                if(conn!=null)
+                {
+                    conn.disconnect();
+                }
+            }
+        }
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 return true;
             }
         };
+
     }
 
     public void onLocationChanged(Location newLoc) {
@@ -95,12 +146,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Intent intent = new Intent(this, AddRestaurantActivity.class);
             startActivityForResult(intent, 0);
             return true;
-        } else if (item.getItemId() == R.id.preferences) {
+        }
+        else if (item.getItemId() == R.id.preferences) {
             Intent intent = new Intent(this, PreferencesActivity.class);
             startActivity(intent);
             return true;
         }
-          else if (item.getItemId() == R.id.savetofile) {
+
+        else if (item.getItemId() == R.id.savetofile) {
             try
               {
                   PrintWriter pw = new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/savedRestaurants.csv", true));
@@ -124,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
               }
           }
 
-            else if (item.getItemId() == R.id.load) {
+        else if (item.getItemId() == R.id.load) {
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(Environment.getExternalStorageDirectory().getAbsolutePath() + "/savedRestaurants.csv"));
                 String line;
@@ -149,8 +202,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             }
         }
+        else if (item.getItemId() == R.id.loadfromint)
+            {
+                Download download = new Download();
+                download.execute();
+            }
             return false;
-    }
+        }
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == 0) {
@@ -197,3 +255,28 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
