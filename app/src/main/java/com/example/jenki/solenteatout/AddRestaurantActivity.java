@@ -25,7 +25,7 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
 public class AddRestaurantActivity extends Activity implements View.OnClickListener{
-
+    // onCreate with button.
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -33,6 +33,7 @@ public class AddRestaurantActivity extends Activity implements View.OnClickListe
         Button regular = (Button)findViewById(R.id.bt1);
         regular.setOnClickListener(this);
     }
+    // onClick that sends data back to MainActivity.
     public void onClick(View view)
     {
         Intent intent = new Intent();

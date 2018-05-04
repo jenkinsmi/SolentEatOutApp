@@ -37,52 +37,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     MapView mv;
     ItemizedIconOverlay<OverlayItem> MarkerArray;
     ItemizedIconOverlay.OnItemGestureListener<OverlayItem> markerGestureListener;
-    class Download extends AsyncTask<Void,Void,String>
-    {
-        public String doInBackground(Void... unused)
-        {
-            HttpURLConnection conn = null;
-            try
-            {URL url = new URL("http://www.free-map.org.uk/course/mad/ws/get.php?year=18&username=user018&format=CSV");
-                conn = (HttpURLConnection) url.openConnection();
-                InputStream in = conn.getInputStream();
-                if(conn.getResponseCode() == 200)
-                {
-                    BufferedReader br = new BufferedReader(new InputStreamReader(in));
-                    String line;
-                    while((line = br.readLine()) != null)
-                    {
-                        String[] comp = line.split(",");
-                        if (comp.length == 6)
-                        {
-                            Double lat = Double.valueOf(comp[4]);
-                            Double lon = Double.valueOf(comp[5]);
-                            MarkerArray = new ItemizedIconOverlay<>(MainActivity.this, new ArrayList<OverlayItem>(), markerGestureListener);
-                            OverlayItem arrayitem = new OverlayItem(comp[0], comp[1]+comp[2]+comp[3], new GeoPoint(lat, lon));
-                            MarkerArray.addItem(arrayitem);
-                            mv.getOverlays().add(MarkerArray);
-                        }
-                    }
-                    return line;
-                }
-                else
-                {
-                    return "error:" + conn.getResponseCode();
-                }
-            }
-            catch(IOException e)
-            {
-                return e.toString();
-            }
-            finally
-            {
-                if(conn!=null)
-                {
-                    conn.disconnect();
-                }
-            }
-        }
-    }
+    //onCreate that creates the map and the markers with long/short views.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,18 +55,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         markerGestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
 
             public boolean onItemSingleTapUp(int index, OverlayItem item) {
-                Toast.makeText(MainActivity.this, item.getTitle() + item.getSnippet(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, item.getTitle() + "," + item.getSnippet(), Toast.LENGTH_SHORT).show();
                 return true;
             }
 
             public boolean onItemLongPress(int index, OverlayItem item) {
-                Toast.makeText(MainActivity.this, item.getSnippet(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, item.getTitle() + "," + item.getSnippet(), Toast.LENGTH_SHORT).show();
                 return true;
             }
         };
 
     }
-
+    // GPS change location of map centre.
     public void onLocationChanged(Location newLoc) {
         double latitude = newLoc.getLatitude();
         double longitude = newLoc.getLongitude();
@@ -134,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         Toast.makeText(this, "Status changed: " + status,
                 Toast.LENGTH_LONG).show();
     }
-
+    // options menu
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
@@ -184,8 +139,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 while ((line = reader.readLine()) != null )  {
                     String[] comp = line.split(",");
                     if(comp.length == 6)  {
-                        Double lat = Double.valueOf(comp[4]);
-                        Double lon = Double.valueOf(comp[5]);
+                        Double lat = Double.valueOf(comp[5]);
+                        Double lon = Double.valueOf(comp[4]);
                         MarkerArray = new ItemizedIconOverlay<>(this, new ArrayList<OverlayItem>(), markerGestureListener);
                         OverlayItem arrayitem = new OverlayItem(comp[0], comp[1]+comp[2]+comp[3], new GeoPoint(lat, lon));
                         try {
@@ -204,13 +159,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
         else if (item.getItemId() == R.id.loadfromint)
             {
+                mv.getOverlays().add(MarkerArray);
                 Download download = new Download();
                 download.execute();
             }
-            return false;
+            return true;
         }
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
+    // code to set information from addRestaurantActivity set as new markers.
         if (requestCode == 0) {
 
             if (resultCode == RESULT_OK) {
@@ -227,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 boolean autosave = prefs.getBoolean("autosave", true);
 
+                // autosave code.
                 if (autosave)
                 {
                     try
@@ -250,6 +207,52 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     {
                         Toast.makeText(this, "Error Saving", Toast.LENGTH_LONG).show();
                     }
+                }
+            }
+        }
+    }
+    // class for downloading from the internet, called from loadfrominternet menu option.
+    class Download extends AsyncTask<Void,Void,String>
+    {
+        public String doInBackground(Void... unused)
+        {
+            HttpURLConnection conn = null;
+            try
+            {URL url = new URL("http://www.free-map.org.uk/course/mad/ws/get.php?year=18&username=user018&format=CSV");
+                conn = (HttpURLConnection) url.openConnection();
+                InputStream in = conn.getInputStream();
+                if(conn.getResponseCode() == 200)
+                {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                    String line;
+                    while((line = br.readLine()) != null)
+                    {
+                        String[] comp = line.split(",");
+                        if (comp.length == 6)
+                        {
+                            Double lat = Double.valueOf(comp[5]).doubleValue();
+                            Double lon = Double.valueOf(comp[4]).doubleValue();
+                            OverlayItem arrayitem = new OverlayItem(comp[0], comp[1]+comp[2]+comp[3], new GeoPoint(lat, lon));
+                            MarkerArray.addItem(arrayitem);
+
+
+                        }
+                    }return line;
+                }
+                else
+                {
+                    return "error:" + conn.getResponseCode();
+                }
+            }
+            catch(IOException e)
+            {
+                return e.toString();
+            }
+            finally
+            {
+                if(conn!=null)
+                {
+                    conn.disconnect();
                 }
             }
         }
